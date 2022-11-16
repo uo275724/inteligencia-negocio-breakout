@@ -2,7 +2,7 @@ import torch
 import random
 import numpy as np
 from collections import deque
-from breakout import wall, paddle, game_ball
+from breakout_IA import wall, paddle, game_ball
 from model import Linear_QNet, QTrainer
 from helper import plot
 
