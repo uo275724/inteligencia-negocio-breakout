@@ -26,6 +26,8 @@ fps = 60
 
 
 class BreakoutGameAI:
+    # Funcion que inicializa variables locales, como la screen o la pelota.
+    # Al terminar llama a reset
     def __init__(self):
         self.screen = pygame.display.set_mode((screen_width, screen_height))
         pygame.display.set_caption('Breakout')
@@ -33,12 +35,14 @@ class BreakoutGameAI:
         # define game variables
         
         self.clock = pygame.time.Clock()
-        self.live_ball = False
-        self.game_over = 0
         self.reset()
 
-
+    # Devuelve el juego al estado inicial
+    # (Nota: ahora mismo solo es lo que estaba justo antes del bucle inicial)
     def reset(self):
+        self.live_ball = False
+        self.game_over = 0
+
         # create a wall
         self.wall = self.wall()
         self.wall.create_wall()
@@ -51,12 +55,13 @@ class BreakoutGameAI:
 
         self.run = True
 
-
     # function for outputting text onto the screen
     def draw_text(self, text, font, text_col, x, y):
         img = font.render(text, True, text_col)
         self.screen.blit(img, (x, y))
 
+    # Contiene el bucle principal tal cual estaba.
+    # Es para poder probar que todo funcione bien hasta ahora al utilizar esta clase como main
     def bucle_juego_prueba(self):
         # BUCLE PRINCIPAL DEL JUEGO
         while self.run:

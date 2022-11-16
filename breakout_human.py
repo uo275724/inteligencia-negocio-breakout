@@ -38,7 +38,6 @@ def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
     screen.blit(img, (x, y))
 
-
 # brick wall class
 class wall():
     def __init__(self):
@@ -220,6 +219,7 @@ player_paddle = paddle()
 ball = game_ball(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
 
 run = True
+# BUCLE PRINCIPAL
 while run:
 
     clock.tick(fps)
