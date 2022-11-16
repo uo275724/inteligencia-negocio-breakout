@@ -1,8 +1,10 @@
 import torch
 import random
 import numpy as np
+from enum import Enum
+from collections import namedtuple
 from collections import deque
-from breakout_IA import wall, paddle, game_ball
+from breakout_IA import BreakoutGameAI
 from model import Linear_QNet, QTrainer
 from helper import plot
 
@@ -10,8 +12,15 @@ MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
 LR = 0.001
 
+class Direction(Enum):
+    RIGHT = 1
+    LEFT = -1
+
 class Agent:
 
+    
+    
+    
     def __init__(self):
         self.n_games = 0
         self.epsilon = 0 # randomness
@@ -22,47 +31,34 @@ class Agent:
 
 
     def get_state(self, game):
-        head = game.snake[0]
-        point_l = Point(head.x - 20, head.y)
-        point_r = Point(head.x + 20, head.y)
-        point_u = Point(head.x, head.y - 20)
-        point_d = Point(head.x, head.y + 20)
+        Point = namedtuple('Point', 'x, y') 
+        paddel_position = Point(game.player_paddle.x,game.player_paddle.y)
+        ball_position = Point(game.ball.x, game.ball.y)
         
-        dir_l = game.direction == Direction.LEFT
-        dir_r = game.direction == Direction.RIGHT
-        dir_u = game.direction == Direction.UP
-        dir_d = game.direction == Direction.DOWN
-
+        dir_l = game.player_paddle.direction == Direction.LEFT
+        dir_r = game.player_paddle.direction == Direction.RIGHT
+        
         state = [
-            # Danger straight
-            (dir_r and game.is_collision(point_r)) or 
-            (dir_l and game.is_collision(point_l)) or 
-            (dir_u and game.is_collision(point_u)) or 
-            (dir_d and game.is_collision(point_d)),
+            # Ball Left
+            (paddel_position.x > ball_position.x),
 
-            # Danger right
-            (dir_u and game.is_collision(point_r)) or 
-            (dir_d and game.is_collision(point_l)) or 
-            (dir_l and game.is_collision(point_u)) or 
-            (dir_r and game.is_collision(point_d)),
+            # Ball right
+            ((paddel_position.x < ball_position.x)),
 
-            # Danger left
-            (dir_d and game.is_collision(point_r)) or 
-            (dir_u and game.is_collision(point_l)) or 
-            (dir_r and game.is_collision(point_u)) or 
-            (dir_l and game.is_collision(point_d)),
+            # Ball top
+            ((paddel_position.x < ball_position.x)),
             
             # Move direction
             dir_l,
             dir_r,
-            dir_u,
-            dir_d,
             
-            # Food location 
+            """
+            Implementar posición ladrillos
             game.food.x < game.head.x,  # food left
             game.food.x > game.head.x,  # food right
             game.food.y < game.head.y,  # food up
             game.food.y > game.head.y  # food down
+            """
             ]
 
         return np.array(state, dtype=int)
@@ -87,9 +83,9 @@ class Agent:
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
         self.epsilon = 80 - self.n_games
-        final_move = [0,0,0]
+        final_move = [0,0]
         if random.randint(0, 200) < self.epsilon:
-            move = random.randint(0, 2)
+            move = random.randint(0, 1)
             final_move[move] = 1
         else:
             state0 = torch.tensor(state, dtype=torch.float)
@@ -106,7 +102,10 @@ def train():
     total_score = 0
     record = 0
     agent = Agent()
-    game = SnakeGameAI()
+    game = BreakoutGameAI()
+    
+    
+    
     while True:
         # get old state
         state_old = agent.get_state(game)
@@ -129,9 +128,9 @@ def train():
             game.reset()
             agent.n_games += 1
             agent.train_long_memory()
-
-            if score > record:
-                record = score
+            
+            if game.score > record:
+                record = game.score
                 agent.model.save()
 
             print('Game', agent.n_games, 'Score', score, 'Record:', record)

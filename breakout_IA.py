@@ -110,8 +110,41 @@ class BreakoutGameAI:
             pygame.display.update()
 
         pygame.quit()
+    '''TEST PLAY PARA IA POR HACER'''
+    def play_step(self, action):
+        self.frame_iteration += 1
+        # 1. collect user input
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        
+        # 2. move
+        self._move(action) # update the head
+        self.snake.insert(0, self.head)
+        
+        # 3. check if game over
+        reward = 0
+        
+        if self.is_collision() or self.frame_iteration > 100*len(self.snake):
+            game_over = True
+            reward = -10
+            return reward, game_over, self.score
 
-
+        # 4. place new food or just move
+        if self.head == self.food:
+            self.score += 1
+            reward = 10
+            self._place_food()
+        else:
+            self.snake.pop()
+        
+        # 5. update ui and clock
+        pygame.display.update()
+        self.clock.tick(fps)
+        # 6. return game over and score
+        return reward, game_over, self.score
+    '''TEST PLAY PARA IA POR HACER'''
     # brick wall class
     class wall():
         def __init__(self):
@@ -288,4 +321,5 @@ class BreakoutGameAI:
 if __name__ == '__main__':
     game = BreakoutGameAI()
     game.bucle_juego_prueba()
-
+else: 
+    game = BreakoutGameAI()
