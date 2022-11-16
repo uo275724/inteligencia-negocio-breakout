@@ -33,7 +33,7 @@ class BreakoutGameAI:
         pygame.display.set_caption('Breakout')
 
         # define game variables
-        
+        self.score = 0
         self.clock = pygame.time.Clock()
         self.reset()
 
@@ -88,16 +88,20 @@ class BreakoutGameAI:
                 if self.game_over == 0:
                     self.draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
                 elif self.game_over == 1:
-                    self.draw_text('YOU WON!', font, text_col, 240, screen_height // 2 + 50)
-                    self.draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
+                    #self.draw_text('YOU WON!', font, text_col, 240, screen_height // 2 + 50)
+                    #self.draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
+                    pygame.quit()
+                    quit()
                 elif self.game_over == -1:
-                    self.draw_text('YOU LOST!', font, text_col, 240, screen_height // 2 + 50)
-                    self.draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
+                    #self.draw_text('YOU LOST!', font, text_col, 240, screen_height // 2 + 50)
+                    #self.draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
+                    pygame.quit()
+                    quit()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.run = False
-                if event.type == pygame.MOUSEBUTTONDOWN and self.live_ball == False:
+                if  self.live_ball == False: # and event.type == pygame.MOUSEBUTTONDOWN :
                     self.live_ball = True
                     self.ball.reset(self.player_paddle.x + (self.player_paddle.width // 2), self.player_paddle.y - self.player_paddle.height)
                     self.player_paddle.reset()
@@ -200,6 +204,9 @@ class BreakoutGameAI:
             for row in super.wall.blocks:
                 item_count = 0
                 for item in row:
+                    """
+                    SCORE SE SUMA AQUÍ
+                    """
                     # check collision
                     if self.rect.colliderect(item[0]):
                         # check if collision was from above
@@ -217,9 +224,11 @@ class BreakoutGameAI:
                         # reduce the block's strength by doing damage to it
                         if super.wall.blocks[row_count][item_count][1] > 1:
                             super.wall.blocks[row_count][item_count][1] -= 1
+                            super.score += 10
                         else:
                             super.wall.blocks[row_count][item_count][0] = (0, 0, 0, 0)
-
+                            super.score += 5
+                        print("Score: {}".format(super.score))
                     # check if block still exists, in whcih case the wall is not destroyed
                     if super.wall.blocks[row_count][item_count][0] != (0, 0, 0, 0):
                         wall_destroyed = 0
