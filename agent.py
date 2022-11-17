@@ -175,8 +175,8 @@ def train():
             agent.n_games += 1
             agent.train_long_memory()
             
-            if game.score > record:
-                record = game.score
+            if score > record:
+                record = score
                 agent.model.save()
 
             print('Game', agent.n_games, 'Score', score, 'Record:', record)
@@ -189,5 +189,5 @@ def train():
 
 
 if __name__ == '__main__':
-    #train()
-    test()
+    train()
+    #test()

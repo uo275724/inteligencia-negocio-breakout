@@ -138,13 +138,13 @@ class BreakoutGameAI:
     def play_step(self, action):
         #self.frame_iteration += 1
         # 1. Mirar si se intentó cerrar la ventana
-        
+        self.clock.tick(fps)
+        self.screen.fill(bg)
         self.wall.draw_wall(self)
         self.player_paddle.draw(self)
         self.ball.draw(self)
         
-        self.clock.tick(fps)
-        self.screen.fill(bg)
+        
         
         gameover = False
         for event in pygame.event.get():
