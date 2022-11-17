@@ -9,7 +9,7 @@ from model import Linear_QNet, QTrainer
 from helper import plot
 
 MAX_MEMORY = 100_000
-BATCH_SIZE = 1000
+BATCH_SIZE = 100
 LR = 0.001
 
 class Direction(Enum):
@@ -23,10 +23,10 @@ class Agent:
     
     def __init__(self):
         self.n_games = 0
-        self.epsilon = 0 # randomness
+        self.epsilon = 10 # randomness
         self.gamma = 0.9 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
-        self.model = Linear_QNet(5, 256, 3)
+        self.model = Linear_QNet(4, 64, 2)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
 
@@ -40,17 +40,18 @@ class Agent:
         
         state = [
             # Ball Left
-            (paddel_position.x > ball_position.x),
+            (paddel_position.x-game.player_paddle.width/2 > ball_position.x),
 
             # Ball right
-            ((paddel_position.x < ball_position.x)),
+            (paddel_position.x+game.player_paddle.width/2 < ball_position.x),
 
             # Ball top
-            ((paddel_position.x == ball_position.x)),
+            (paddel_position.x+game.player_paddle.width/2 > ball_position.x) and
+            (paddel_position.x-game.player_paddle.width/2 < ball_position.x),
             
-            # Move direction
-            dir_l,
-            dir_r
+            # paddle direction
+            (paddel_position.y +20 > ball_position.y)
+   
             ]
         """
         Implementar posición ladrillos
@@ -82,10 +83,11 @@ class Agent:
 
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
-        self.epsilon = 80 - self.n_games
-        final_move = [0,0,0] # [IZDA, QUIETO, DCHA]
-        if random.randint(0, 200) < self.epsilon:
-            move = random.randint(0, 2)
+        self.epsilon = 150 - self.n_games
+        #final_move = [0,0,0] # [IZDA, QUIETO, DCHA]
+        final_move = [0,0] # [IZDA, DCHA]
+        if random.randint(0, 100) < self.epsilon:
+            move = random.randint(0, 1)
             final_move[move] = 1
         else:
             state0 = torch.tensor(state, dtype=torch.float)
@@ -150,7 +152,7 @@ def train():
     agent = Agent()
     game = BreakoutGameAI()
     
-    
+
     
     while True:
         # get old state
