@@ -24,7 +24,7 @@ text_col = (78, 81, 139)
 
 cols = 6
 rows = 6
-fps = 60
+fps = 100000000
 
 class Direction(Enum):
     RIGHT = 1
@@ -190,10 +190,14 @@ class BreakoutGameAI:
         '''
         if self.ball.rect.colliderect(self.player_paddle):
             reward = 10
+        if ((self.player_paddle.x+self.player_paddle.width/2 > self.ball.x) and
+            (self.player_paddle.x-self.player_paddle.width/2 < self.ball.x)):
+            reward = 5
+        
         # 5. update ui and clock
         # draw all objects
         
-
+        
         pygame.display.update()
         # 6. return game over and score
         return reward, gameover, self.score
@@ -265,7 +269,7 @@ class BreakoutGameAI:
             # Accion = [IZDA, QUIETO, DCHA] será uno donde toque
             # reset movement direction (por defecto)
             self.direction = 0
-            
+            '''
             if np.array_equal(action, [1,0,0]) and self.rect.left > 0:
                 # IZQUIERDA
                 self.rect.x -= self.speed
@@ -277,7 +281,15 @@ class BreakoutGameAI:
                 # DERECHA
                 self.rect.x += self.speed
                 self.direction = 1
-
+            '''
+            if np.array_equal(action, [1,0]) and self.rect.left > 0:
+                # IZQUIERDA
+                self.rect.x -= self.speed
+                self.direction = -1
+            if np.array_equal(action, [0,1]) and self.rect.right < screen_width:
+                # DERECHA
+                self.rect.x += self.speed
+                self.direction = 1
         def draw(self,super):
             pygame.draw.rect(super.screen, paddle_col, self.rect)
             pygame.draw.rect(super.screen, paddle_outline, self.rect, 3)
@@ -329,9 +341,11 @@ class BreakoutGameAI:
                         if super.wall.blocks[row_count][item_count][1] > 1:
                             super.wall.blocks[row_count][item_count][1] -= 1
                             super.score += 10
+
                         else:
                             super.wall.blocks[row_count][item_count][0] = (0, 0, 0, 0)
                             super.score += 5
+
                         print("Score: {}".format(super.score))
                     # check if block still exists, in whcih case the wall is not destroyed
                     if super.wall.blocks[row_count][item_count][0] != (0, 0, 0, 0):
