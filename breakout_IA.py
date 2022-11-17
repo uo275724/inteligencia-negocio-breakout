@@ -63,7 +63,7 @@ class BreakoutGameAI:
         self.frame_iteration = 0
         self.score = 0
 
-
+        
         #Reset objects
         self.live_ball = True
         self.ball.reset(self.player_paddle.x + (self.player_paddle.width // 2), self.player_paddle.y - self.player_paddle.height)
@@ -138,13 +138,22 @@ class BreakoutGameAI:
     def play_step(self, action):
         #self.frame_iteration += 1
         # 1. Mirar si se intentó cerrar la ventana
+        
+        self.wall.draw_wall(self)
+        self.player_paddle.draw(self)
+        self.ball.draw(self)
+        
+        self.clock.tick(fps)
+        self.screen.fill(bg)
+        
+        gameover = False
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     #self.run = False
                     pygame.quit()
                     quit()
 
-        
+
         # 2. Moverse según la acción
         self.player_paddle._move(action) # update the head
 
@@ -158,30 +167,36 @@ class BreakoutGameAI:
                 self.game_over = self.ball.move(self)
                 if self.game_over != 0:
                     self.live_ball = False
-
+                    
 
         reward = 0
         
-        if self.is_collision() or self.frame_iteration > 100*len(self.snake):
-            game_over = True
+        if self.game_over == -1:
+            gameover = True
             reward = -10
-            return reward, game_over, self.score
-
+            return reward, gameover, self.score
+        if self.game_over == 1:
+            gameover = True
+            reward = 10
+            return reward, gameover, self.score
+        # 4. UPDATE SCORE  
+        '''  
         # 4. place new food or just move
-        if self.head == self.food:
-            self.score += 1
+        if self.ball.:
             reward = 10
             self._place_food()
         else:
             self.snake.pop()
-        
+        '''
+        if self.ball.rect.colliderect(self.player_paddle):
+            reward = 10
         # 5. update ui and clock
-        self.clock.tick(fps)
-        self.screen.fill(bg)
+        # draw all objects
+        
 
         pygame.display.update()
         # 6. return game over and score
-        return reward, game_over, self.score
+        return reward, gameover, self.score
     '''TEST PLAY PARA IA POR HACER'''
     # brick wall class
     class wall():
