@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+from enum import Enum
 
 pygame.init()
 
@@ -24,6 +25,10 @@ cols = 6
 rows = 6
 fps = 60
 
+class Direction(Enum):
+    RIGHT = 1
+    LEFT = -1
+
 
 class BreakoutGameAI:
     # Funcion que inicializa variables locales, como la screen o la pelota.
@@ -33,16 +38,9 @@ class BreakoutGameAI:
         pygame.display.set_caption('Breakout')
 
         # define game variables
-        self.score = 0
         self.clock = pygame.time.Clock()
-        self.reset()
 
-    # Devuelve el juego al estado inicial
-    # (Nota: ahora mismo solo es lo que estaba justo antes del bucle inicial)
-    def reset(self):
-        self.live_ball = False
-        self.game_over = 0
-
+        # Create the objects
         # create a wall
         self.wall = self.wall()
         self.wall.create_wall()
@@ -52,6 +50,25 @@ class BreakoutGameAI:
 
         # create ball
         self.ball = self.game_ball(self.player_paddle.x + (self.player_paddle.width // 2), self.player_paddle.y - self.player_paddle.height)
+
+        self.reset()
+
+        
+
+    # Devuelve el juego al estado inicial
+    # (Nota: ahora mismo solo es lo que estaba justo antes del bucle inicial)
+    def reset(self):
+        self.game_over = 0
+        self.frame_iteration = 0
+        self.score = 0
+
+
+        #Reset objects
+        self.live_ball = True
+        self.ball.reset(self.player_paddle.x + (self.player_paddle.width // 2), self.player_paddle.y - self.player_paddle.height)
+        self.player_paddle.reset()
+        self.wall.create_wall()
+
 
         self.run = True
 
@@ -84,28 +101,34 @@ class BreakoutGameAI:
                     self.live_ball = False
 
             # print player instructions
-            if not self.live_ball:
-                if self.game_over == 0:
-                    self.draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
-                elif self.game_over == 1:
-                    #self.draw_text('YOU WON!', font, text_col, 240, screen_height // 2 + 50)
-                    #self.draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
-                    pygame.quit()
-                    quit()
-                elif self.game_over == -1:
-                    #self.draw_text('YOU LOST!', font, text_col, 240, screen_height // 2 + 50)
-                    #self.draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
-                    pygame.quit()
-                    quit()
+        
+            #if self.game_over == 0:
+                #self.draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
+            if self.game_over == 1:
+                #self.draw_text('YOU WON!', font, text_col, 240, screen_height // 2 + 50)
+                #self.draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
+                pygame.quit()
+                quit()
+            elif self.game_over == -1:
+                #self.draw_text('YOU LOST!', font, text_col, 240, screen_height // 2 + 50)
+                #self.draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
+                print("Perdiste :C")
+                pygame.quit()
+                quit()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    #Aqui solo se llega si cierras la ventana
                     self.run = False
+                    print("Cerraste la ventana")
+                """
                 if  self.live_ball == False: # and event.type == pygame.MOUSEBUTTONDOWN :
                     self.live_ball = True
                     self.ball.reset(self.player_paddle.x + (self.player_paddle.width // 2), self.player_paddle.y - self.player_paddle.height)
                     self.player_paddle.reset()
                     self.wall.create_wall()
+                """
+
 
             pygame.display.update()
 
@@ -115,9 +138,11 @@ class BreakoutGameAI:
         self.frame_iteration += 1
         # 1. collect user input
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
+                if event.type == pygame.QUIT:
+                    #self.run = False
+                    pygame.quit()
+                    quit()
+
         
         # 2. move
         self._move(action) # update the head
