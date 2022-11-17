@@ -173,7 +173,7 @@ class BreakoutGameAI:
         
         if self.game_over == -1:
             gameover = True
-            reward = -10
+            reward = -100000000
             return reward, gameover, self.score
         if self.game_over == 1:
             gameover = True
@@ -189,11 +189,12 @@ class BreakoutGameAI:
             self.snake.pop()
         '''
         if self.ball.rect.colliderect(self.player_paddle):
-            reward = 10
-        if ((self.player_paddle.x+self.player_paddle.width/2 > self.ball.x) and
-            (self.player_paddle.x-self.player_paddle.width/2 < self.ball.x)):
-            reward = 5
+            reward = 1000
         
+        if ((self.player_paddle.x+self.player_paddle.width/2 > self.ball.x) and
+            (self.player_paddle.x-self.player_paddle.width/2 < self.ball.x) and (self.player_paddle.y < self.ball.y)):
+            reward += 50000000
+       
         # 5. update ui and clock
         # draw all objects
         
