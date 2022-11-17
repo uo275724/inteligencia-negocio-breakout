@@ -148,11 +148,18 @@ class BreakoutGameAI:
         # 2. Moverse según la acción
         self._move(action) # update the head
 
-        # TODO: El resto está sin hacer
-
-        self.snake.insert(0, self.head)
+        # TODO: El resto está sin hacer, auque tiene algunas cosas hechas
         
         # 3. check if game over
+        if self.live_ball:
+                # draw paddle
+                self.player_paddle.move()
+                # draw ball
+                self.game_over = self.ball.move(self)
+                if self.game_over != 0:
+                    self.live_ball = False
+
+
         reward = 0
         
         if self.is_collision() or self.frame_iteration > 100*len(self.snake):
@@ -169,8 +176,10 @@ class BreakoutGameAI:
             self.snake.pop()
         
         # 5. update ui and clock
-        pygame.display.update()
         self.clock.tick(fps)
+        self.screen.fill(bg)
+
+        pygame.display.update()
         # 6. return game over and score
         return reward, game_over, self.score
     '''TEST PLAY PARA IA POR HACER'''
