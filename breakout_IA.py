@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 from enum import Enum
+import numpy as np
 
 pygame.init()
 
@@ -135,8 +136,8 @@ class BreakoutGameAI:
         pygame.quit()
     '''TEST PLAY PARA IA POR HACER'''
     def play_step(self, action):
-        self.frame_iteration += 1
-        # 1. collect user input
+        #self.frame_iteration += 1
+        # 1. Mirar si se intentó cerrar la ventana
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     #self.run = False
@@ -144,8 +145,11 @@ class BreakoutGameAI:
                     quit()
 
         
-        # 2. move
+        # 2. Moverse según la acción
         self._move(action) # update the head
+
+        # TODO: El resto está sin hacer
+
         self.snake.insert(0, self.head)
         
         # 3. check if game over
@@ -229,6 +233,24 @@ class BreakoutGameAI:
                 self.rect.x -= self.speed
                 self.direction = -1
             if key[pygame.K_RIGHT] and self.rect.right < screen_width:
+                self.rect.x += self.speed
+                self.direction = 1
+        
+        def _move(self, action):
+            # Igual que el anterior, pero en vez de usando las keys, la accion
+            # Accion = [IZDA, QUIETO, DCHA] será uno donde toque
+            # reset movement direction (por defecto)
+            self.direction = 0
+            
+            if np.array_equal(action, [1,0,0]) and self.rect.left > 0:
+                # IZQUIERDA
+                self.rect.x -= self.speed
+                self.direction = -1
+            if np.array_equal(action, [0,1,0]):
+                # QUIETO
+                self.direction = 0
+            if np.array_equal(action, [0,0,1]) and self.rect.right < screen_width:
+                # DERECHA
                 self.rect.x += self.speed
                 self.direction = 1
 
