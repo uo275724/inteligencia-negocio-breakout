@@ -146,7 +146,7 @@ class BreakoutGameAI:
 
         
         # 2. Moverse según la acción
-        self._move(action) # update the head
+        self.player_paddle._move(action) # update the head
 
         # TODO: El resto está sin hacer, auque tiene algunas cosas hechas
         
