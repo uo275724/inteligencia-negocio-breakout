@@ -269,7 +269,7 @@ class BreakoutGameAI:
             # Accion = [IZDA, QUIETO, DCHA] será uno donde toque
             # reset movement direction (por defecto)
             self.direction = 0
-            '''
+            
             if np.array_equal(action, [1,0,0]) and self.rect.left > 0:
                 # IZQUIERDA
                 self.rect.x -= self.speed
@@ -290,6 +290,7 @@ class BreakoutGameAI:
                 # DERECHA
                 self.rect.x += self.speed
                 self.direction = 1
+            '''
         def draw(self,super):
             pygame.draw.rect(super.screen, paddle_col, self.rect)
             pygame.draw.rect(super.screen, paddle_outline, self.rect, 3)

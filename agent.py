@@ -26,7 +26,7 @@ class Agent:
         self.epsilon = 10 # randomness
         self.gamma = 0.9 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
-        self.model = Linear_QNet(4, 64, 2)
+        self.model = Linear_QNet(12, 128, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
 
@@ -50,8 +50,19 @@ class Agent:
             (paddel_position.x-game.player_paddle.width/2 < ball_position.x),
             
             # paddle direction
-            (paddel_position.y +20 > ball_position.y)
-   
+            (paddel_position.y +20 > ball_position.y),
+            # Se mueve a la derecha
+            (game.ball.speed_x > 0),
+            # Se mueve a la izquierda
+            (game.ball.speed_x < 0),
+            # Se mueve arriba
+            (game.ball.speed_y > 0),
+            # Se mueve abajo
+            (game.ball.speed_y < 0),
+            dir_l,
+            dir_r,
+            (paddel_position.x > (game.screen.get_width()-game.player_paddle.width )),
+            (paddel_position.x < (game.player_paddle.width))
             ]
         """
         Implementar posición ladrillos
@@ -83,11 +94,11 @@ class Agent:
 
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
-        self.epsilon = 150 - self.n_games
-        #final_move = [0,0,0] # [IZDA, QUIETO, DCHA]
-        final_move = [0,0] # [IZDA, DCHA]
+        self.epsilon = 80 - self.n_games
+        final_move = [0,0,0] # [IZDA, QUIETO, DCHA]
+        #final_move = [0,0] # [IZDA, DCHA]
         if random.randint(0, 100) < self.epsilon:
-            move = random.randint(0, 1)
+            move = random.randint(0, 2)
             final_move[move] = 1
         else:
             state0 = torch.tensor(state, dtype=torch.float)
@@ -106,7 +117,7 @@ def test():
     game = BreakoutGameAI()
     
     
-    
+
     while True:
         # get old state
         #state_old = agent.get_state(game)
