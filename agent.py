@@ -8,8 +8,8 @@ from breakout_IA import BreakoutGameAI
 from model import Linear_QNet, QTrainer
 from helper import plot
 
-MAX_MEMORY = 100_000
-BATCH_SIZE = 100
+MAX_MEMORY = 100_000_000_000
+BATCH_SIZE = 1000000
 LR = 0.001
 
 class Direction(Enum):
@@ -23,10 +23,10 @@ class Agent:
     
     def __init__(self):
         self.n_games = 0
-        self.epsilon = 10 # randomness
-        self.gamma = 0.9 # discount rate
+        self.epsilon = 1000 # randomness
+        self.gamma = 0.5 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
-        self.model = Linear_QNet(12, 128, 3)
+        self.model = Linear_QNet(13, 128, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
 
@@ -50,7 +50,7 @@ class Agent:
             (paddel_position.x-game.player_paddle.width/2 < ball_position.x),
             
             # paddle direction
-            (paddel_position.y +20 > ball_position.y),
+            # (paddel_position.y +20 > ball_position.y),
             # Se mueve a la derecha
             (game.ball.speed_x > 0),
             # Se mueve a la izquierda
@@ -61,6 +61,8 @@ class Agent:
             (game.ball.speed_y < 0),
             dir_l,
             dir_r,
+            (dir_l == (game.ball.speed_x <0)),
+            (dir_r == (game.ball.speed_x >0)),
             (paddel_position.x > (game.screen.get_width()-game.player_paddle.width )),
             (paddel_position.x < (game.player_paddle.width))
             ]
@@ -94,10 +96,10 @@ class Agent:
 
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
-        self.epsilon = 80 - self.n_games
+        self.epsilon = 200 - self.n_games
         final_move = [0,0,0] # [IZDA, QUIETO, DCHA]
         #final_move = [0,0] # [IZDA, DCHA]
-        if random.randint(0, 100) < self.epsilon:
+        if random.randint(0, 200) < self.epsilon:
             move = random.randint(0, 2)
             final_move[move] = 1
         else:
