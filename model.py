@@ -14,14 +14,14 @@ class Linear_QNet(nn.Module):
             print("CPU")
             self.dev = "cpu" 
         self.linear1 = nn.Linear(input_size, hidden_size).to(self.dev)
-        #self.linear15 = nn.Linear(hidden_size,hidden_size).to(self.dev)
-        #elf.linear25 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+        self.linear15 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+        self.linear25 = nn.Linear(hidden_size,hidden_size).to(self.dev)
         self.linear2 = nn.Linear(hidden_size, output_size).to(self.dev)
 
     def forward(self, x):
         x = F.relu(self.linear1(x)).to(self.dev)
-        #x = self.linear15(x)
-        #x = self.linear25(x)
+        x = self.linear15(x)
+        x = self.linear25(x)
         x = self.linear2(x)
         return x
 

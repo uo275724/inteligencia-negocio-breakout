@@ -24,7 +24,7 @@ text_col = (78, 81, 139)
 
 cols = 6
 rows = 6
-fps = 100000000
+fps = 60
 
 class Direction(Enum):
     RIGHT = 1
@@ -170,23 +170,23 @@ class BreakoutGameAI:
                     
 
         reward = 0
-        
+        if self.ball.rect.colliderect(self.player_paddle):
+            reward = 1000000
         if self.game_over == -1:
             gameover = True
-            reward = -100000000
+            reward = -1000000000
             return reward, gameover, self.score
         if self.game_over == 1:
             gameover = True
-            reward = 10
+            reward = 1000
             return reward, gameover, self.score
 
-        if self.ball.rect.colliderect(self.player_paddle):
-            reward = 1000
         
+        '''
         if ((self.player_paddle.x+self.player_paddle.width/2 > self.ball.x) and
             (self.player_paddle.x-self.player_paddle.width/2 < self.ball.x) and (self.player_paddle.y < self.ball.y)):
-            reward += 50000000
-       
+            reward += 5000
+        '''
         # 5. update ui and clock
         # draw all objects
         
