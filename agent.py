@@ -6,7 +6,14 @@ from collections import namedtuple
 from collections import deque
 from breakout_IA import BreakoutGameAI
 from model import Linear_QNet, QTrainer
+import torch
 from helper import plot
+if torch.cuda.is_available():
+    print("GPU")  
+    dev = "cuda:0" 
+else:  
+    print("CPU")
+    dev = "cpu" 
 
 MAX_MEMORY = 100_000_000_000
 BATCH_SIZE = 1000000
@@ -23,7 +30,7 @@ class Agent:
         self.epsilon = 1000 # randomness
         self.gamma = 0.5 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
-        self.model = Linear_QNet(13, 128, 3)
+        self.model = Linear_QNet(13, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
 
@@ -99,7 +106,7 @@ class Agent:
             move = random.randint(0, 2)
             final_move[move] = 1
         else:
-            state0 = torch.tensor(state, dtype=torch.float)
+            state0 = torch.tensor(state, dtype=torch.float).to(device=dev)
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
             final_move[move] = 1
