@@ -155,14 +155,14 @@ class BreakoutGameAI:
 
 
         # 2. Moverse según la acción
-        self.player_paddle._move(action) # update the head
+        #self.player_paddle._move(action) # update the head
 
         # TODO: El resto está sin hacer, auque tiene algunas cosas hechas
         
         # 3. check if game over
         if self.live_ball:
                 # draw paddle
-                self.player_paddle.move()
+                self.player_paddle._move()
                 # draw ball
                 self.game_over = self.ball.move(self)
                 if self.game_over != 0:
