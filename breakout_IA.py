@@ -179,15 +179,7 @@ class BreakoutGameAI:
             gameover = True
             reward = 10
             return reward, gameover, self.score
-        # 4. UPDATE SCORE  
-        '''  
-        # 4. place new food or just move
-        if self.ball.:
-            reward = 10
-            self._place_food()
-        else:
-            self.snake.pop()
-        '''
+
         if self.ball.rect.colliderect(self.player_paddle):
             reward = 1000
         
