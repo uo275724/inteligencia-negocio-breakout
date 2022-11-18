@@ -162,7 +162,7 @@ class BreakoutGameAI:
         # 3. check if game over
         if self.live_ball:
                 # draw paddle
-                self.player_paddle._move()
+                self.player_paddle._move(action)
                 # draw ball
                 self.game_over = self.ball.move(self)
                 if self.game_over != 0:

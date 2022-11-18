@@ -17,9 +17,6 @@ class Direction(Enum):
     LEFT = -1
 
 class Agent:
-
-    
-    
     
     def __init__(self):
         self.n_games = 0
@@ -88,8 +85,7 @@ class Agent:
 
         states, actions, rewards, next_states, dones = zip(*mini_sample)
         self.trainer.train_step(states, actions, rewards, next_states, dones)
-        #for state, action, reward, nexrt_state, done in mini_sample:
-        #    self.trainer.train_step(state, action, reward, next_state, done)
+        
 
     def train_short_memory(self, state, action, reward, next_state, done):
         self.trainer.train_step(state, action, reward, next_state, done)
@@ -155,7 +151,6 @@ def test():
             mean_score = total_score / agent.n_games
             plot_mean_scores.append(mean_score)
             plot(plot_scores, plot_mean_scores)
-
 
 def train():
     plot_scores = []
