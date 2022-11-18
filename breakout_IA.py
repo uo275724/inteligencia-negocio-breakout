@@ -24,7 +24,7 @@ text_col = (78, 81, 139)
 
 cols = 6
 rows = 6
-fps = 60
+fps = 10000
 
 class Direction(Enum):
     RIGHT = 1
@@ -174,7 +174,7 @@ class BreakoutGameAI:
             reward = 1000000
         if self.game_over == -1:
             gameover = True
-            reward = -1000000000
+            reward = -100
             return reward, gameover, self.score
         if self.game_over == 1:
             gameover = True

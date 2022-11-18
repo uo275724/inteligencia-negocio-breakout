@@ -14,11 +14,10 @@ if torch.cuda.is_available():
 else:  
     print("CPU")
     dev = "cpu" 
-FRAMES = 1
-MAX_MEMORY = 100
-BATCH_SIZE = 10
-LR = 0.1
-
+FRAMES = 10
+MAX_MEMORY = 1000_000_000_000
+BATCH_SIZE = 1000000000000
+LR = 0.01
 class Direction(Enum):
     RIGHT = 1
     LEFT = -1
@@ -28,9 +27,9 @@ class Agent:
     def __init__(self):
         self.n_games = 0
         self.epsilon = 50 # randomness
-        self.gamma = 0.9 # discount rate
+        self.gamma = 0.6 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
-        self.model = Linear_QNet(5, 1024, 3)
+        self.model = Linear_QNet(7, 32, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
 
@@ -44,15 +43,15 @@ class Agent:
         
         state = [
             # Ball Left
-            #(paddel_position.x-game.player_paddle.width/2 > ball_position.x),
+            (paddel_position.x-game.player_paddle.width/2 > ball_position.x),
 
             # Ball right
-            #(paddel_position.x+game.player_paddle.width/2 < ball_position.x),
+            (paddel_position.x+game.player_paddle.width/2 < ball_position.x),
 
             # Ball top
-            #(paddel_position.x+game.player_paddle.width/2 > ball_position.x) and
-            #(paddel_position.x-game.player_paddle.width/2 < ball_position.x),
-            (paddel_position.x== ball_position.x),
+            (paddel_position.x+game.player_paddle.width/2 > ball_position.x) and
+            (paddel_position.x-game.player_paddle.width/2 < ball_position.x),
+            #(paddel_position.x== ball_position.x),
             # paddle direction
             # (paddel_position.y +20 > ball_position.y),
             # Se mueve a la derecha
@@ -211,6 +210,7 @@ def train():
             plot_mean_scores.append(mean_score)
             plot(plot_scores, plot_mean_scores)
             reward, done, score = (0,False,0)
+        reward = 0
 
 
 if __name__ == '__main__':
