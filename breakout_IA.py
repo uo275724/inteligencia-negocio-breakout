@@ -200,9 +200,9 @@ class BreakoutGameAI:
             aux = abs(self.player_paddle.rect.x - self.ball.rect.x) * -1
             reward = aux
         
-        print("Reward: {}".format(reward))
+        #print("Reward: {}".format(reward))
         
-        pygame.display.update()
+        #pygame.display.update()
         # 6. return game over and score
         return reward, gameover, self.score
     '''TEST PLAY PARA IA POR HACER'''

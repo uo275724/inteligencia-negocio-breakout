@@ -16,8 +16,8 @@ else:
     dev = "cpu" 
 FRAMES = 1
 MAX_MEMORY = 100_000
-BATCH_SIZE = 10000
-LR = 0.01
+BATCH_SIZE = 100
+LR = 0.1
 
 class Direction(Enum):
     RIGHT = 1
@@ -30,7 +30,7 @@ class Agent:
         self.epsilon = 0 # randomness
         self.gamma = 0.9 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
-        self.model = Linear_QNet(3, 128, 3)
+        self.model = Linear_QNet(3, 32, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
 
