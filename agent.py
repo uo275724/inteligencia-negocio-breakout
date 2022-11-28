@@ -211,6 +211,7 @@ def train():
             plot_mean_scores.append(mean_score)
             plot(plot_scores, plot_mean_scores)
             reward, done, score = (0,False,0)
+        reward = 0
 
 
 if __name__ == '__main__':
