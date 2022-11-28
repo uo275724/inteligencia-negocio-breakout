@@ -15,9 +15,9 @@ else:
     print("CPU")
     dev = "cpu" 
 FRAMES = 1
-MAX_MEMORY = 100
-BATCH_SIZE = 10
-LR = 0.1
+MAX_MEMORY = 100_000
+BATCH_SIZE = 10000
+LR = 0.01
 
 class Direction(Enum):
     RIGHT = 1
@@ -27,42 +27,42 @@ class Agent:
     
     def __init__(self):
         self.n_games = 0
-        self.epsilon = 50 # randomness
+        self.epsilon = 0 # randomness
         self.gamma = 0.9 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
-        self.model = Linear_QNet(5, 1024, 3)
+        self.model = Linear_QNet(3, 128, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
 
     def get_state(self, game):
         Point = namedtuple('Point', 'x, y') 
-        paddel_position = Point(game.player_paddle.x,game.player_paddle.y)
-        ball_position = Point(game.ball.x, game.ball.y)
+        paddel_position = Point(game.player_paddle.rect.x,game.player_paddle.rect.y)
+        ball_position = Point(game.ball.rect.x, game.ball.rect.y)
         
         dir_l = game.player_paddle.direction == Direction.LEFT
         dir_r = game.player_paddle.direction == Direction.RIGHT
-        
+        #print("GETSTATE PaddleX {} BALLX {} ".format(paddel_position.x,ball_position.x))
         state = [
             # Ball Left
-            #(paddel_position.x-game.player_paddle.width/2 > ball_position.x),
+            (paddel_position.x-game.player_paddle.width/2 > ball_position.x),
 
             # Ball right
-            #(paddel_position.x+game.player_paddle.width/2 < ball_position.x),
+            (paddel_position.x+game.player_paddle.width/2 < ball_position.x),
 
             # Ball top
-            #(paddel_position.x+game.player_paddle.width/2 > ball_position.x) and
-            #(paddel_position.x-game.player_paddle.width/2 < ball_position.x),
-            (paddel_position.x== ball_position.x),
+            (paddel_position.x+(game.player_paddle.width/2)*0.9 >= ball_position.x) and
+            (paddel_position.x-(game.player_paddle.width/2)*0.9 <= ball_position.x)#,
+            #(paddel_position.x== ball_position.x),
             # paddle direction
             # (paddel_position.y +20 > ball_position.y),
             # Se mueve a la derecha
-            (game.ball.speed_x > 0),
+            #(game.ball.speed_x > 0),
             # Se mueve a la izquierda
-            (game.ball.speed_x < 0),
+            #(game.ball.speed_x < 0),
             # Se mueve arriba
-            (game.ball.speed_y > 0),
+            #(game.ball.speed_y > 0),
             # Se mueve abajo
-            (game.ball.speed_y < 0)#,
+            #(game.ball.speed_y < 0)#,
             #dir_l,
             #dir_r,
             #(dir_l == (game.ball.speed_x <0)),
@@ -99,7 +99,7 @@ class Agent:
 
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
-        self.epsilon = 80 - self.n_games
+        self.epsilon = 20 - self.n_games
         final_move = [0,0,0] # [IZDA, QUIETO, DCHA]
         #final_move = [0,0] # [IZDA, DCHA]
         if random.randint(0, 200) < self.epsilon:
