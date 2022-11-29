@@ -17,7 +17,7 @@ else:
 FRAMES = 1
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
-LR = 0.1
+LR = 0.001
 
 class Direction(Enum):
     RIGHT = 1
@@ -30,7 +30,7 @@ class Agent:
         self.epsilon = 0 # randomness
         self.gamma = 0.9 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
-        self.model = Linear_QNet(4, 32, 3)
+        self.model = Linear_QNet(3, 32, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
 
@@ -44,7 +44,6 @@ class Agent:
         #print("GETSTATE PaddleX {} BALLX {} ".format(paddel_position.x,ball_position.x))
         state = [
             paddel_position.x,
-            paddel_position.y,
             ball_position.x,
             ball_position.y
 
@@ -105,10 +104,10 @@ class Agent:
 
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
-        self.epsilon = 80 - self.n_games
+        self.epsilon = 150 - self.n_games
         final_move = [0,0,0] # [IZDA, QUIETO, DCHA]
         #final_move = [0,0] # [IZDA, DCHA]
-        if random.randint(0, 200) < self.epsilon:
+        if random.randint(0, 100) < self.epsilon:
             move = random.randint(0, 2)
             final_move[move] = 1
         else:

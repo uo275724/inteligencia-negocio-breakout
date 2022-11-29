@@ -194,14 +194,19 @@ class BreakoutGameAI:
         
         if (((self.player_paddle.rect.x+(game.player_paddle.width/2)*0.9 >= self.ball.rect.x) and
             (self.player_paddle.rect.x-(game.player_paddle.width/2)*0.9 <= self.ball.rect.x) )):
-            reward = 5
+            aux = 100
+            
+            # La recompensa es mayor si la pelota está cerca de la paleta
+            aux = (self.ball.rect.y/screen_height) * (aux)
+
+            reward = aux
             #print("ESTÁ DEBAJOOOOOOOOOOOOOO")
         else:
             # Más castigo si está lejos (en horizontal)
             aux = abs(self.player_paddle.rect.x - self.ball.rect.x) * -1
 
             # El castigo es más severo si además la pelota está cerca del suelo
-            aux = (self.ball.rect.y) * (aux)
+            aux = (self.ball.rect.y/screen_height) * (aux)
             # aux = (self.ball.rect.y/screen_height) * (aux)
 
             reward = aux
