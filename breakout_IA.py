@@ -197,12 +197,17 @@ class BreakoutGameAI:
             reward = 5
             #print("ESTÁ DEBAJOOOOOOOOOOOOOO")
         else:
+            # Más castigo si está lejos (en horizontal)
             aux = abs(self.player_paddle.rect.x - self.ball.rect.x) * -1
+
+            # El castigo es más severo si además la pelota está cerca del suelo
+            aux = (self.ball.rect.y) * (aux)
+            # aux = (self.ball.rect.y/screen_height) * (aux)
+
             reward = aux
-        
         #print("Reward: {}".format(reward))
-        
-        #pygame.display.update()
+
+        pygame.display.update()
         # 6. return game over and score
         return reward, gameover, self.score
     '''TEST PLAY PARA IA POR HACER'''

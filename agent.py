@@ -16,7 +16,7 @@ else:
     dev = "cpu" 
 FRAMES = 1
 MAX_MEMORY = 100_000
-BATCH_SIZE = 100
+BATCH_SIZE = 1000
 LR = 0.1
 
 class Direction(Enum):
@@ -30,7 +30,7 @@ class Agent:
         self.epsilon = 0 # randomness
         self.gamma = 0.9 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
-        self.model = Linear_QNet(3, 32, 3)
+        self.model = Linear_QNet(4, 32, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
 
@@ -43,15 +43,21 @@ class Agent:
         dir_r = game.player_paddle.direction == Direction.RIGHT
         #print("GETSTATE PaddleX {} BALLX {} ".format(paddel_position.x,ball_position.x))
         state = [
+            paddel_position.x,
+            paddel_position.y,
+            ball_position.x,
+            ball_position.y
+
+
             # Ball Left
-            (paddel_position.x-game.player_paddle.width/2 > ball_position.x),
-
-            # Ball right
-            (paddel_position.x+game.player_paddle.width/2 < ball_position.x),
-
-            # Ball top
-            (paddel_position.x+(game.player_paddle.width/2)*0.9 >= ball_position.x) and
-            (paddel_position.x-(game.player_paddle.width/2)*0.9 <= ball_position.x)#,
+            # (paddel_position.x-game.player_paddle.width/2 > ball_position.x),
+# 
+            # # Ball right
+            # (paddel_position.x+game.player_paddle.width/2 < ball_position.x),
+# 
+            # # Ball top
+            # (paddel_position.x+(game.player_paddle.width/2)*0.9 >= ball_position.x) and
+            # (paddel_position.x-(game.player_paddle.width/2)*0.9 <= ball_position.x)#,
             #(paddel_position.x== ball_position.x),
             # paddle direction
             # (paddel_position.y +20 > ball_position.y),
@@ -99,7 +105,7 @@ class Agent:
 
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
-        self.epsilon = 20 - self.n_games
+        self.epsilon = 80 - self.n_games
         final_move = [0,0,0] # [IZDA, QUIETO, DCHA]
         #final_move = [0,0] # [IZDA, DCHA]
         if random.randint(0, 200) < self.epsilon:
