@@ -13,15 +13,31 @@ class Linear_QNet(nn.Module):
         else:  
             print("CPU")
             self.dev = "cpu" 
-        self.linear1 = nn.Linear(input_size, hidden_size).to(self.dev)
-        self.linear15 = nn.Linear(hidden_size,hidden_size).to(self.dev)
-        self.linear25 = nn.Linear(hidden_size,hidden_size).to(self.dev)
-        self.linear2 = nn.Linear(hidden_size, output_size).to(self.dev)
+            self.linear1 = nn.Linear(input_size, hidden_size).to(self.dev)
+            self.linear15 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+            self.linear25 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+            self.linear35 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+            self.linear45 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+            self.linear55 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+            self.linear65 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+            self.linear75 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+            self.linear85 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+            self.linear95 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+            self.linear05 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+            self.linear2 = nn.Linear(hidden_size, output_size).to(self.dev)
 
     def forward(self, x):
         x = F.relu(self.linear1(x)).to(self.dev)
         x = self.linear15(x)
         x = self.linear25(x)
+        x = self.linear35(x)
+        x = self.linear45(x)
+        x = self.linear55(x)
+        x = self.linear65(x)
+        x = self.linear75(x)
+        x = self.linear85(x)
+        x = self.linear95(x)
+        x = self.linear05(x)
         x = self.linear2(x)
         return x
 

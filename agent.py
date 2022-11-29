@@ -15,9 +15,9 @@ else:
     print("CPU")
     dev = "cpu" 
 FRAMES = 1
-MAX_MEMORY = 100_000
-BATCH_SIZE = 1000
-LR = 0.001
+MAX_MEMORY = 100_000_000_000_000_000
+BATCH_SIZE = 10000
+LR = 0.00005
 
 class Direction(Enum):
     RIGHT = 1
@@ -104,7 +104,7 @@ class Agent:
 
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
-        self.epsilon = 150 - self.n_games
+        self.epsilon = 100 - self.n_games
         final_move = [0,0,0] # [IZDA, QUIETO, DCHA]
         #final_move = [0,0] # [IZDA, DCHA]
         if random.randint(0, 100) < self.epsilon:
