@@ -39,69 +39,8 @@ class Agent:
         Point = namedtuple('Point', 'x, y') 
         paddel_position = Point(game.player_paddle.rect.x,game.player_paddle.rect.y)
         ball_position = Point(game.ball.rect.x, game.ball.rect.y)
-        
-        dir_l = game.player_paddle.direction == Direction.LEFT
-        dir_r = game.player_paddle.direction == Direction.RIGHT
-        #print("GETSTATE PaddleX {} BALLX {} ".format(paddel_position.x,ball_position.x))
-        state = [
-            paddel_position.x,
-            ball_position.x,
-            ball_position.y
-
-
-            # Ball Left
-            # (paddel_position.x-game.player_paddle.width/2 > ball_position.x),
-# 
-            # # Ball right
-            # (paddel_position.x+game.player_paddle.width/2 < ball_position.x),
-# 
-            # # Ball top
-            # (paddel_position.x+(game.player_paddle.width/2)*0.9 >= ball_position.x) and
-            # (paddel_position.x-(game.player_paddle.width/2)*0.9 <= ball_position.x)#,
-            #(paddel_position.x== ball_position.x),
-            # paddle direction
-            # (paddel_position.y +20 > ball_position.y),
-            # Se mueve a la derecha
-            #(game.ball.speed_x > 0),
-            # Se mueve a la izquierda
-            #(game.ball.speed_x < 0),
-            # Se mueve arriba
-            #(game.ball.speed_y > 0),
-            # Se mueve abajo
-            #(game.ball.speed_y < 0)#,
-            #dir_l,
-            #dir_r,
-            #(dir_l == (game.ball.speed_x <0)),
-            #(dir_r == (game.ball.speed_x >0)),
-            #(paddel_position.x > (game.screen.get_width()-game.player_paddle.width )),
-            #(paddel_position.x < (game.player_paddle.width))
-            ]
-        """
-        Implementar posición ladrillos
-        game.food.x < game.head.x,  # food left
-        game.food.x > game.head.x,  # food right
-        game.food.y < game.head.y,  # food up
-        game.food.y > game.head.y  # food down
-        """
-            
-
+        state = [paddel_position.x, ball_position.x, ball_position.y]
         return np.array(state, dtype=int)
-
-    def remember(self, state, action, reward, next_state, done):
-        self.memory.append((state, action, reward, next_state, done)) # popleft if MAX_MEMORY is reached
-
-    def train_long_memory(self):
-        if len(self.memory) > BATCH_SIZE:
-            mini_sample = random.sample(self.memory, BATCH_SIZE) # list of tuples
-        else:
-            mini_sample = self.memory
-
-        states, actions, rewards, next_states, dones = zip(*mini_sample)
-        self.trainer.train_step(states, actions, rewards, next_states, dones)
-        
-
-    def train_short_memory(self, state, action, reward, next_state, done):
-        self.trainer.train_step(state, action, reward, next_state, done)
 
     def get_action(self, state):
         final_move = [0,0,0] # [IZDA, QUIETO, DCHA]
@@ -133,19 +72,11 @@ def test():
         reward, done, score = game.play_step(final_move)
         
         state_new = agent.get_state(game)
-        '''
-        # train short memory
-        agent.train_short_memory(state_old, final_move, reward, state_new, done)
-
-        # remember
-        agent.remember(state_old, final_move, reward, state_new, done)
-        '''
+       
         if done:
-            # train long memory, plot result
             game.reset()
             agent.n_games += 1
-            #agent.train_long_memory()
-            
+
             if score > record:
                 record = score
                 #agent.model.save()
@@ -158,61 +89,5 @@ def test():
             plot_mean_scores.append(mean_score)
             plot(plot_scores, plot_mean_scores)
 
-def train():
-    plot_scores = []
-    plot_mean_scores = []
-    total_score = 0
-    record = 0
-    agent = Agent()
-    game = BreakoutGameAI()
-    
-
-    reward, done, score = (0,False,0)
-    while True:
-        # get old state
-        state_old = agent.get_state(game)
-
-        # get move
-        final_move = agent.get_action(torch.tensor(state_old))
-
-        # perform move and get new state
-        for i in range(FRAMES):
-            aux = game.play_step(final_move)
-            reward += aux[0]
-            done = aux[1]
-            score = aux[2]
-            if (done):
-                break
-        state_new = agent.get_state(game)
-
-        # train short memory
-        agent.train_short_memory(state_old, final_move, reward, state_new, done)
-
-        # remember
-        agent.remember(state_old, final_move, reward, state_new, done)
-
-        if done:
-            # train long memory, plot result
-            
-            game.reset()
-            agent.n_games += 1
-            agent.train_long_memory()
-            
-            if score > record:
-                record = score
-                agent.model.save()
-
-            print('Game', agent.n_games, 'Score', score, 'Record:', record)
-
-            plot_scores.append(score)
-            total_score += score
-            mean_score = total_score / agent.n_games
-            plot_mean_scores.append(mean_score)
-            plot(plot_scores, plot_mean_scores)
-            reward, done, score = (0,False,0)
-        reward = 0
-
-
 if __name__ == '__main__':
-    #train()
     test()
