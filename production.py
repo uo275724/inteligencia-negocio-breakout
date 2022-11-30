@@ -104,18 +104,11 @@ class Agent:
         self.trainer.train_step(state, action, reward, next_state, done)
 
     def get_action(self, state):
-        # random moves: tradeoff exploration / exploitation
-        self.epsilon = 100 - self.n_games
         final_move = [0,0,0] # [IZDA, QUIETO, DCHA]
-        #final_move = [0,0] # [IZDA, DCHA]
-        if random.randint(0, 100) < self.epsilon:
-            move = random.randint(0, 2)
-            final_move[move] = 1
-        else:
-            state0 = torch.tensor(state, dtype=torch.float).to(device=dev)
-            prediction = self.model(state0)
-            move = torch.argmax(prediction).item()
-            final_move[move] = 1
+        state0 = torch.tensor(state, dtype=torch.float).to(device=dev)
+        prediction = self.model(state0)
+        move = torch.argmax(prediction).item()
+        final_move[move] = 1
 
         return final_move
 
@@ -134,7 +127,7 @@ def test():
         state_old = agent.get_state(game)
         
         # get move
-        final_move = agent.model(state_old)
+        final_move = agent.get_action(state_old)
 
         # perform move and get new state
         reward, done, score = game.play_step(final_move)
