@@ -31,7 +31,8 @@ class Agent:
         self.gamma = 0.9 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
         self.model = Linear_QNet(3, 32, 3)
-        self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
+        self.model.load_state_dict(torch.load("/home/diego/model/model.pth"))
+        self.model.eval()
 
 
     def get_state(self, game):
@@ -130,16 +131,16 @@ def test():
 
     while True:
         # get old state
-        #state_old = agent.get_state(game)
-
+        state_old = agent.get_state(game)
+        
         # get move
-        final_move = random.choice([[1,0,0],[0,1,0],[0,0,1]])
+        final_move = agent.model(state_old)
 
         # perform move and get new state
         reward, done, score = game.play_step(final_move)
-        '''
+        
         state_new = agent.get_state(game)
-
+        '''
         # train short memory
         agent.train_short_memory(state_old, final_move, reward, state_new, done)
 
@@ -179,7 +180,7 @@ def train():
         state_old = agent.get_state(game)
 
         # get move
-        final_move = agent.get_action(state_old)
+        final_move = agent.get_action(torch.tensor(state_old))
 
         # perform move and get new state
         for i in range(FRAMES):
@@ -220,5 +221,5 @@ def train():
 
 
 if __name__ == '__main__':
-    train()
-    #test()
+    #train()
+    test()

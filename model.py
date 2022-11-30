@@ -14,6 +14,7 @@ class Linear_QNet(nn.Module):
             print("CPU")
             self.dev = "cpu" 
         self.linear1 = nn.Linear(input_size, hidden_size).to(self.dev)
+        '''
         self.linear15 = nn.Linear(hidden_size,hidden_size).to(self.dev)
         self.linear25 = nn.Linear(hidden_size,hidden_size).to(self.dev)
         self.linear35 = nn.Linear(hidden_size,hidden_size).to(self.dev)
@@ -24,10 +25,22 @@ class Linear_QNet(nn.Module):
         self.linear85 = nn.Linear(hidden_size,hidden_size).to(self.dev)
         self.linear95 = nn.Linear(hidden_size,hidden_size).to(self.dev)
         self.linear05 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+        self.linear16 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+        self.linear26 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+        self.linear36 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+        self.linear46 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+        self.linear56 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+        self.linear66 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+        self.linear76 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+        self.linear86 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+        self.linear96 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+        self.linear06 = nn.Linear(hidden_size,hidden_size).to(self.dev)
+        '''
         self.linear2 = nn.Linear(hidden_size, output_size).to(self.dev)
 
     def forward(self, x):
         x = F.relu(self.linear1(x)).to(self.dev)
+        '''
         x = self.linear15(x)
         x = self.linear25(x)
         x = self.linear35(x)
@@ -38,6 +51,17 @@ class Linear_QNet(nn.Module):
         x = self.linear85(x)
         x = self.linear95(x)
         x = self.linear05(x)
+        x = self.linear16(x) 
+        x = self.linear26(x) 
+        x = self.linear36(x) 
+        x = self.linear46(x) 
+        x = self.linear56(x)
+        x = self.linear66(x) 
+        x = self.linear76(x) 
+        x = self.linear86(x) 
+        x = self.linear96(x) 
+        x = self.linear06(x) 
+        '''
         x = self.linear2(x)
         return x
 

@@ -179,6 +179,7 @@ class BreakoutGameAI:
         if self.game_over == 1:
             gameover = True
             reward = 1000
+            self.score+=69000
             return reward, gameover, self.score
 
         
