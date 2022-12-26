@@ -7,12 +7,8 @@ import os
 class Linear_QNet(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
         super().__init__()
-        if torch.cuda.is_available():
-            print("GPU")  
-            self.dev = "cuda:0" 
-        else:  
-            print("CPU")
-            self.dev = "cpu" 
+    
+        self.dev = "cpu" 
         self.linear1 = nn.Linear(input_size, hidden_size).to(self.dev)
         '''
         self.linear15 = nn.Linear(hidden_size,hidden_size).to(self.dev)

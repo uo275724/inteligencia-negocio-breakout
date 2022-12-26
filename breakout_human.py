@@ -104,7 +104,9 @@ class BreakoutGameAI:
                     self.wall.create_wall()
 
             pygame.display.update()
-
+            print("Posición paleta x: {} ".format(self.player_paddle.rect.x))
+            print("Posición Bola x: {}".format(self.ball.rect.x))          
+            print("Posición Bola y: {}".format(self.ball.rect.y))   
         pygame.quit()
 
 

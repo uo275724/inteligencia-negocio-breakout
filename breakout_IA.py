@@ -54,7 +54,8 @@ class BreakoutGameAI:
 
         self.reset()
 
-        
+    def getScreen(self):
+        return pygame.surfarray.array3d(self.screen)    
 
     # Devuelve el juego al estado inicial
     # (Nota: ahora mismo solo es lo que estaba justo antes del bucle inicial)
@@ -135,6 +136,53 @@ class BreakoutGameAI:
 
         pygame.quit()
     '''TEST PLAY PARA IA POR HACER'''
+    def play_step(self):
+        #self.frame_iteration += 1
+        # 1. Mirar si se intentó cerrar la ventana
+        self.clock.tick(fps)
+        self.screen.fill(bg)
+        self.wall.draw_wall(self)
+        self.player_paddle.draw(self)
+        self.ball.draw(self)
+        
+        
+        
+        gameover = False
+        for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    #self.run = False
+                    pygame.quit()
+                    quit()
+
+
+
+        # 3. check if game over
+        if self.live_ball:
+            # draw paddle
+            
+            # draw ball
+            self.game_over = self.ball.move(self)
+            if self.game_over != 0:
+                self.live_ball = False
+                    
+        
+            
+        #if self.ball.rect.colliderect(self.player_paddle):
+            #reward = 1000000
+        if self.game_over == -1:
+            gameover = True
+            return gameover, self.score
+        if self.game_over == 1:
+            gameover = True
+            
+            self.score+=69000
+            return gameover, self.score  
+
+
+        pygame.display.update()
+        # 6. return game over and score
+        return gameover, self.score
+
     def play_step(self, action):
         #self.frame_iteration += 1
         # 1. Mirar si se intentó cerrar la ventana

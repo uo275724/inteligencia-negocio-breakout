@@ -6,14 +6,11 @@ from collections import namedtuple
 from collections import deque
 from breakout_IA import BreakoutGameAI
 from model import Linear_QNet, QTrainer
+from cv import getCoordinates
 import torch
 from helper import plot
-if torch.cuda.is_available():
-    print("GPU")  
-    dev = "cuda:0" 
-else:  
-    print("CPU")
-    dev = "cpu" 
+
+dev = "cpu" 
 FRAMES = 1
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
@@ -36,10 +33,13 @@ class Agent:
 
 
     def get_state(self, game):
-        Point = namedtuple('Point', 'x, y') 
-        paddel_position = Point(game.player_paddle.rect.x,game.player_paddle.rect.y)
-        ball_position = Point(game.ball.rect.x, game.ball.rect.y)
-        state = [paddel_position.x, ball_position.x, ball_position.y]
+        Point = namedtuple('Point', 'x, y')
+        
+        
+        state = getCoordinates(game.getScreen())
+        print("Paddle X-> Game:{} OpenCV:{}".format(game.player_paddle.rect.x,state[0]))
+        print("Ball X-> Game:{} OpenCV:{}".format(game.ball.rect.x,state[1]))
+        print("Ball Y-> Game:{} OpenCV:{}".format(game.ball.rect.y,state[2]))
         return np.array(state, dtype=int)
 
     def get_action(self, state):
@@ -69,8 +69,9 @@ def test():
         final_move = agent.get_action(state_old)
 
         # perform move and get new state
-        reward, done, score = game.play_step(final_move)
+        game.play_step(final_move)
         
+        reward, done, score = game.play_step(final_move)
         state_new = agent.get_state(game)
        
         if done:
@@ -79,8 +80,6 @@ def test():
 
             if score > record:
                 record = score
-                #agent.model.save()
-
             print('Game', agent.n_games, 'Score', score, 'Record:', record)
 
             plot_scores.append(score)
