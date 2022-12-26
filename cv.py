@@ -90,17 +90,16 @@ def getCoordinates(view):
         
         
         if len(approx) != 4:
-            ballX = cX-5
-            ballY = cY-13
+            ballX = cX-9
+            ballY = cY-9
             
         else:
-            paddleX = cX-29
+            paddleX = cX-46
     # Showing the final image. 
-    #cv2.imshow('image2', image_copy) 
+    cv2.imshow('image2', image_copy) 
 
     # Exiting the window if 'q' is pressed on the keyboard. 
-    if cv2.waitKey(0) & 0xFF == ord('q'): 
-        cv2.destroyAllWindows()
+    cv2.waitKey(1) 
     return [paddleX,ballX,ballY]
 
 if __name__ == "__main__":

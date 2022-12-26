@@ -9,9 +9,12 @@ from model import Linear_QNet, QTrainer
 from cv import getCoordinates
 import torch
 from helper import plot
-
+errorPX = 0
+count = 0
+errorBX = 0
+errorBY = 0 
 dev = "cpu" 
-FRAMES = 1
+FRAMES = 100000
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
 LR = 0.001
@@ -30,16 +33,22 @@ class Agent:
         self.model = Linear_QNet(3, 32, 3)
         self.model.load_state_dict(torch.load("/home/diego/model/model.pth"))
         self.model.eval()
-
+        
 
     def get_state(self, game):
         Point = namedtuple('Point', 'x, y')
-        
-        
+        global errorBY
+        global errorPX
+        global errorBX
+        global count
         state = getCoordinates(game.getScreen())
         print("Paddle X-> Game:{} OpenCV:{}".format(game.player_paddle.rect.x,state[0]))
         print("Ball X-> Game:{} OpenCV:{}".format(game.ball.rect.x,state[1]))
         print("Ball Y-> Game:{} OpenCV:{}".format(game.ball.rect.y,state[2]))
+        errorPX += game.player_paddle.rect.x - state[0]
+        errorBX += game.ball.rect.x - state[1]
+        errorBY += game.ball.rect.y - state[2]
+        count +=1
         return np.array(state, dtype=int)
 
     def get_action(self, state):
@@ -58,7 +67,7 @@ def test():
     record = 0
     agent = Agent()
     game = BreakoutGameAI()
-    
+     
     
 
     while True:
@@ -80,6 +89,9 @@ def test():
 
             if score > record:
                 record = score
+            print("Error Paddle X: {}".format(errorPX/count))
+            print("Error Ball X: {}".format(errorBX/count))
+            print("Error Ball Y: {}".format(errorBY/count))
             print('Game', agent.n_games, 'Score', score, 'Record:', record)
 
             plot_scores.append(score)
@@ -87,6 +99,7 @@ def test():
             mean_score = total_score / agent.n_games
             plot_mean_scores.append(mean_score)
             plot(plot_scores, plot_mean_scores)
+            
 
 if __name__ == '__main__':
     test()
