@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 from enum import Enum
 import numpy as np
+import random
 
 pygame.init()
 
@@ -24,7 +25,8 @@ text_col = (78, 81, 139)
 
 cols = 6
 rows = 6
-fps = 10000
+fps = 120 #10000
+is_random = False # True for random ball moves
 
 class Direction(Enum):
     RIGHT = 1
@@ -395,13 +397,19 @@ class BreakoutGameAI:
                 if abs(self.rect.bottom - super.player_paddle.rect.top) < collision_thresh and self.speed_y > 0:
                     self.speed_y *= -1
 
-                    self.speed_x += super.player_paddle.direction
+                    # Esto hace que la pelota cambie ligeramente de dirección, como si se le diese efecto
+                    if(not is_random):
+                        self.speed_x += super.player_paddle.direction
+                    # Pues en vez de eso, que sea random:
+                    else:
+                        self.speed_x = random.randint(-self.speed_max, self.speed_max)
 
+                    # Respetar el limite de velocidad
                     if self.speed_x > self.speed_max:
                         self.speed_x = self.speed_max
 
                     elif self.speed_x < 0 and self.speed_x < -self.speed_max:
-                        self.speed_x = -self.speed_max
+                        self.speed_x = -self.speed_max 
 
                 else:
                     self.speed_x *= -1
