@@ -52,7 +52,7 @@ def test():
     if cv2.waitKey(0) & 0xFF == ord('q'): 
         cv2.destroyAllWindows()
 def getCoordinates(view):
-    
+    font = cv2.FONT_HERSHEY_COMPLEX 
     image = view.transpose([1, 0, 2])
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     # Define the lower and upper bounds of the color that you want to detect
@@ -92,9 +92,11 @@ def getCoordinates(view):
         if len(approx) != 4:
             ballX = cX-9
             ballY = cY-9
-            
+            cv2.putText(image_copy, "Ball ({},{})".format(ballX,ballY), (ballX, ballY-5),font, 0.5, (255, 0, 0))
         else:
             paddleX = cX-46
+            paddleY = cY
+            cv2.putText(image_copy, "Paddle({},{})".format(paddleX,paddleY), (paddleX, paddleY-15),font, 0.5, (255, 0, 0))
     # Showing the final image. 
     cv2.imshow('image2', image_copy) 
 
