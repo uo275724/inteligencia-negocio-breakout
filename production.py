@@ -31,7 +31,11 @@ class Agent:
         self.gamma = 0.9 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
         self.model = Linear_QNet(3, 32, 3)
-        self.model.load_state_dict(torch.load("/home/diego/model/model.pth"))
+        if(dev == "cpu"):
+            self.model.load_state_dict(torch.load("model\model.pth",map_location="cpu"))
+        else:
+            self.model.load_state_dict(torch.load("model\model.pth"))
+        
         self.model.eval()
 
 
