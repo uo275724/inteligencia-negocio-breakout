@@ -6,10 +6,17 @@ from collections import namedtuple
 from collections import deque
 from breakout_IA import BreakoutGameAI
 from model import Linear_QNet, QTrainer
+import torch
 from helper import plot
-
-MAX_MEMORY = 100_000_000_000
-BATCH_SIZE = 1000000
+if torch.cuda.is_available():
+    print("GPU")  
+    dev = "cuda:0" 
+else:  
+    print("CPU")
+    dev = "cpu" 
+FRAMES = 1
+MAX_MEMORY = 100_000
+BATCH_SIZE = 1000
 LR = 0.001
 
 class Direction(Enum):
@@ -20,48 +27,53 @@ class Agent:
     
     def __init__(self):
         self.n_games = 0
-        self.epsilon = 1000 # randomness
-        self.gamma = 0.5 # discount rate
+        self.epsilon = 0 # randomness
+        self.gamma = 0.9 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
-        self.model = Linear_QNet(13, 128, 3)
+        self.model = Linear_QNet(3, 32, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
 
     def get_state(self, game):
         Point = namedtuple('Point', 'x, y') 
-        paddel_position = Point(game.player_paddle.x,game.player_paddle.y)
-        ball_position = Point(game.ball.x, game.ball.y)
+        paddel_position = Point(game.player_paddle.rect.x,game.player_paddle.rect.y)
+        ball_position = Point(game.ball.rect.x, game.ball.rect.y)
         
         dir_l = game.player_paddle.direction == Direction.LEFT
         dir_r = game.player_paddle.direction == Direction.RIGHT
-        
+        #print("GETSTATE PaddleX {} BALLX {} ".format(paddel_position.x,ball_position.x))
         state = [
+            paddel_position.x,
+            ball_position.x,
+            ball_position.y
+
+
             # Ball Left
-            (paddel_position.x-game.player_paddle.width/2 > ball_position.x),
-
-            # Ball right
-            (paddel_position.x+game.player_paddle.width/2 < ball_position.x),
-
-            # Ball top
-            (paddel_position.x+game.player_paddle.width/2 > ball_position.x) and
-            (paddel_position.x-game.player_paddle.width/2 < ball_position.x),
-            
+            # (paddel_position.x-game.player_paddle.width/2 > ball_position.x),
+# 
+            # # Ball right
+            # (paddel_position.x+game.player_paddle.width/2 < ball_position.x),
+# 
+            # # Ball top
+            # (paddel_position.x+(game.player_paddle.width/2)*0.9 >= ball_position.x) and
+            # (paddel_position.x-(game.player_paddle.width/2)*0.9 <= ball_position.x)#,
+            #(paddel_position.x== ball_position.x),
             # paddle direction
             # (paddel_position.y +20 > ball_position.y),
             # Se mueve a la derecha
-            (game.ball.speed_x > 0),
+            #(game.ball.speed_x > 0),
             # Se mueve a la izquierda
-            (game.ball.speed_x < 0),
+            #(game.ball.speed_x < 0),
             # Se mueve arriba
-            (game.ball.speed_y > 0),
+            #(game.ball.speed_y > 0),
             # Se mueve abajo
-            (game.ball.speed_y < 0),
-            dir_l,
-            dir_r,
-            (dir_l == (game.ball.speed_x <0)),
-            (dir_r == (game.ball.speed_x >0)),
-            (paddel_position.x > (game.screen.get_width()-game.player_paddle.width )),
-            (paddel_position.x < (game.player_paddle.width))
+            #(game.ball.speed_y < 0)#,
+            #dir_l,
+            #dir_r,
+            #(dir_l == (game.ball.speed_x <0)),
+            #(dir_r == (game.ball.speed_x >0)),
+            #(paddel_position.x > (game.screen.get_width()-game.player_paddle.width )),
+            #(paddel_position.x < (game.player_paddle.width))
             ]
         """
         Implementar posición ladrillos
@@ -92,14 +104,14 @@ class Agent:
 
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
-        self.epsilon = 200 - self.n_games
+        self.epsilon = 100 - self.n_games
         final_move = [0,0,0] # [IZDA, QUIETO, DCHA]
         #final_move = [0,0] # [IZDA, DCHA]
-        if random.randint(0, 200) < self.epsilon:
+        if random.randint(0, 100) < self.epsilon:
             move = random.randint(0, 2)
             final_move[move] = 1
         else:
-            state0 = torch.tensor(state, dtype=torch.float)
+            state0 = torch.tensor(state, dtype=torch.float).to(device=dev)
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
             final_move[move] = 1
@@ -161,7 +173,7 @@ def train():
     game = BreakoutGameAI()
     
 
-    
+    reward, done, score = (0,False,0)
     while True:
         # get old state
         state_old = agent.get_state(game)
@@ -170,7 +182,13 @@ def train():
         final_move = agent.get_action(state_old)
 
         # perform move and get new state
-        reward, done, score = game.play_step(final_move)
+        for i in range(FRAMES):
+            aux = game.play_step(final_move)
+            reward += aux[0]
+            done = aux[1]
+            score = aux[2]
+            if (done):
+                break
         state_new = agent.get_state(game)
 
         # train short memory
@@ -181,6 +199,7 @@ def train():
 
         if done:
             # train long memory, plot result
+            
             game.reset()
             agent.n_games += 1
             agent.train_long_memory()
@@ -196,6 +215,8 @@ def train():
             mean_score = total_score / agent.n_games
             plot_mean_scores.append(mean_score)
             plot(plot_scores, plot_mean_scores)
+            reward, done, score = (0,False,0)
+        reward = 0
 
 
 if __name__ == '__main__':

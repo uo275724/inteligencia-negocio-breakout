@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 from enum import Enum
 import numpy as np
+import random
 
 pygame.init()
 
@@ -24,7 +25,8 @@ text_col = (78, 81, 139)
 
 cols = 6
 rows = 6
-fps = 100000000
+fps = 120 #10000
+is_random = False # True for random ball moves
 
 class Direction(Enum):
     RIGHT = 1
@@ -168,29 +170,51 @@ class BreakoutGameAI:
                 if self.game_over != 0:
                     self.live_ball = False
                     
-
-        reward = 0
         
+            
+        #if self.ball.rect.colliderect(self.player_paddle):
+            #reward = 1000000
         if self.game_over == -1:
             gameover = True
-            reward = -100000000
+            reward = -100
             return reward, gameover, self.score
         if self.game_over == 1:
             gameover = True
-            reward = 10
+            reward = 1000
+            self.score+=69000
             return reward, gameover, self.score
 
-        if self.ball.rect.colliderect(self.player_paddle):
-            reward = 1000
         
+        '''
         if ((self.player_paddle.x+self.player_paddle.width/2 > self.ball.x) and
             (self.player_paddle.x-self.player_paddle.width/2 < self.ball.x) and (self.player_paddle.y < self.ball.y)):
-            reward += 50000000
-       
+            reward += 5000
+        '''
         # 5. update ui and clock
         # draw all objects
+        #print("Posición paleta x: {} ".format(self.player_paddle.rect.x))
+        #print("Posición Bola x: {}".format(self.ball.rect.x))
         
-        
+        if (((self.player_paddle.rect.x+(game.player_paddle.width/2)*0.9 >= self.ball.rect.x) and
+            (self.player_paddle.rect.x-(game.player_paddle.width/2)*0.9 <= self.ball.rect.x) )):
+            aux = 100
+            
+            # La recompensa es mayor si la pelota está cerca de la paleta
+            aux = (self.ball.rect.y/screen_height) * (aux)
+
+            reward = aux
+            #print("ESTÁ DEBAJOOOOOOOOOOOOOO")
+        else:
+            # Más castigo si está lejos (en horizontal)
+            aux = abs(self.player_paddle.rect.x - self.ball.rect.x) * -1
+
+            # El castigo es más severo si además la pelota está cerca del suelo
+            aux = (self.ball.rect.y/screen_height) * (aux)
+            # aux = (self.ball.rect.y/screen_height) * (aux)
+
+            reward = aux
+        #print("Reward: {}".format(reward))
+
         pygame.display.update()
         # 6. return game over and score
         return reward, gameover, self.score
@@ -328,9 +352,12 @@ class BreakoutGameAI:
                         # check if collision was from left
                         if abs(self.rect.right - item[0].left) < collision_thresh and self.speed_x > 0:
                             self.speed_x *= -1
+                            
                         # check if collision was from right
                         if abs(self.rect.left - item[0].right) < collision_thresh and self.speed_x < 0:
                             self.speed_x *= -1
+                            
+                            
                         # reduce the block's strength by doing damage to it
                         if super.wall.blocks[row_count][item_count][1] > 1:
                             super.wall.blocks[row_count][item_count][1] -= 1
@@ -356,9 +383,11 @@ class BreakoutGameAI:
             if self.rect.left < 0 or self.rect.right > screen_width:
                 self.speed_x *= -1
 
+
             # check for collision with top and bottom of the screen
             if self.rect.top < 0:
                 self.speed_y *= -1
+
             if self.rect.bottom > screen_height:
                 self.game_over = -1
 
@@ -367,17 +396,30 @@ class BreakoutGameAI:
                 # check if colliding from the top
                 if abs(self.rect.bottom - super.player_paddle.rect.top) < collision_thresh and self.speed_y > 0:
                     self.speed_y *= -1
-                    self.speed_x += super.player_paddle.direction
+
+                    # Esto hace que la pelota cambie ligeramente de dirección, como si se le diese efecto
+                    if(not is_random):
+                        self.speed_x += super.player_paddle.direction
+                    # Pues en vez de eso, que sea random:
+                    else:
+                        self.speed_x = random.randint(-self.speed_max, self.speed_max)
+
+                    # Respetar el limite de velocidad
                     if self.speed_x > self.speed_max:
                         self.speed_x = self.speed_max
+
                     elif self.speed_x < 0 and self.speed_x < -self.speed_max:
-                        self.speed_x = -self.speed_max
+                        self.speed_x = -self.speed_max 
+
                 else:
                     self.speed_x *= -1
 
+
             self.rect.x += self.speed_x
+
             self.rect.y += self.speed_y
 
+            #print("Dentro de bolaX {}".format(self.rect.x))
             return self.game_over
 
         def draw(self, super):
